@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed;
@@ -15,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     private float _move;
     private Color _rayColor;
     private bool _facingRight = true;
+    private int _speedAnimatorHash = Animator.StringToHash("Speed");
 
     private void Awake()
     {
@@ -31,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
         }
         
         _move = Input.GetAxis("Horizontal");
-        _animator.SetFloat("Speed", Mathf.Abs(_move));
+        _animator.SetFloat(_speedAnimatorHash, Mathf.Abs(_move));
 
         if (_move > 0f && _facingRight == false)
             Flip();
@@ -46,14 +49,17 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsGrounded()
     {
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(_boxCollider2D.bounds.center, Vector2.down, _boxCollider2D.bounds.extents.y + _extraHeight, _groundLayerMask);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(_boxCollider2D.bounds.center, Vector2.down, 
+            _boxCollider2D.bounds.extents.y + _extraHeight, 
+            _groundLayerMask);
 
         if (raycastHit2D.collider != null)
             _rayColor = Color.green;
         else
             _rayColor = Color.red;
 
-        Debug.DrawRay(_boxCollider2D.bounds.center, Vector2.down * (_boxCollider2D.bounds.extents.y + _extraHeight), _rayColor);
+        Debug.DrawRay(_boxCollider2D.bounds.center, 
+            Vector2.down * (_boxCollider2D.bounds.extents.y + _extraHeight), _rayColor);
         return raycastHit2D.collider != null;
     }
 
